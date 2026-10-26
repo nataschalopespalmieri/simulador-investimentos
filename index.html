@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Simulador de rentabilidade de CDB, Tesouro Selic, Tesouro Direto e aposentadoria.">
+  <title>Simulador de Investimentos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="site-header">
+    <div class="container">
+      <h1>Simulador de Investimentos</h1>
+      <p>Simule a rentabilidade de CDB, Tesouro Selic, Tesouro Direto e planeje a sua aposentadoria.</p>
+    </div>
+  </header>
+
+  <main id="conteudo" class="container">
+    <div class="tabs" role="tablist" aria-label="Tipos de simulação">
+      <button type="button" role="tab" id="tab-cdb" aria-controls="panel-cdb" aria-selected="true">CDB</button>
+      <button type="button" role="tab" id="tab-selic" aria-controls="panel-selic" aria-selected="false" tabindex="-1">Tesouro Selic</button>
+      <button type="button" role="tab" id="tab-tesouro" aria-controls="panel-tesouro" aria-selected="false" tabindex="-1">Tesouro Direto</button>
+      <button type="button" role="tab" id="tab-aposentadoria" aria-controls="panel-aposentadoria" aria-selected="false" tabindex="-1">Aposentadoria</button>
+    </div>
+
+    <!-- ===================== CDB ===================== -->
+    <section id="panel-cdb" role="tabpanel" aria-labelledby="tab-cdb" class="panel">
+      <div class="layout">
+        <form id="form-cdb" class="card form" data-tipo="cdb" novalidate>
+          <h2>Simulação de CDB</h2>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="cdb-inicial">Valor inicial (R$)</label>
+              <input id="cdb-inicial" name="inicial" class="money" type="text" inputmode="decimal" autocomplete="off" value="10.000,00">
+            </div>
+            <div class="field">
+              <label for="cdb-aporte">Aporte mensal (R$)</label>
+              <input id="cdb-aporte" name="aporte" class="money" type="text" inputmode="decimal" autocomplete="off" value="500,00">
+            </div>
+          </div>
+
+          <fieldset class="group helper">
+            <legend>Calcular a taxa pelo CDI (opcional)</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="cdb-cdi">CDI (% a.a.)</label>
+                <input id="cdb-cdi" name="cdi" type="text" inputmode="decimal" autocomplete="off" value="14,90" data-ignore-live>
+              </div>
+              <div class="field">
+                <label for="cdb-pct">Percentual do CDI (%)</label>
+                <input id="cdb-pct" name="pct_cdi" type="text" inputmode="decimal" autocomplete="off" value="110" data-ignore-live>
+              </div>
+            </div>
+            <button type="button" class="btn secondary" data-action="aplicar-cdi">Usar esta taxa</button>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend>Taxa de juros</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="cdb-taxa-aa">Ao ano (% a.a.)</label>
+                <input id="cdb-taxa-aa" name="taxa_aa" type="text" inputmode="decimal" autocomplete="off" aria-describedby="cdb-taxa-hint">
+              </div>
+              <div class="field">
+                <label for="cdb-taxa-am">Ao mês (% a.m.)</label>
+                <input id="cdb-taxa-am" name="taxa_am" type="text" inputmode="decimal" autocomplete="off" aria-describedby="cdb-taxa-hint">
+              </div>
+            </div>
+            <p class="hint" id="cdb-taxa-hint">Preencha um dos campos. O outro é calculado automaticamente por juros compostos.</p>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend>Prazo para resgate</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="cdb-meses">Em meses</label>
+                <input id="cdb-meses" name="meses" type="text" inputmode="numeric" autocomplete="off" value="24">
+              </div>
+              <div class="field">
+                <label for="cdb-anos">Em anos</label>
+                <input id="cdb-anos" name="anos" type="text" inputmode="decimal" autocomplete="off" value="2">
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="check">
+            <input id="cdb-ir" name="ir" type="checkbox" checked>
+            <label for="cdb-ir">Descontar Imposto de Renda (tabela regressiva)</label>
+          </div>
+
+          <p class="form-error" role="alert"></p>
+          <button type="submit" class="btn primary">Simular</button>
+        </form>
+        <div class="results" id="results-cdb" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ===================== TESOURO SELIC ===================== -->
+    <section id="panel-selic" role="tabpanel" aria-labelledby="tab-selic" class="panel" hidden>
+      <div class="layout">
+        <form id="form-selic" class="card form" data-tipo="selic" novalidate>
+          <h2>Simulação do Tesouro Selic</h2>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="selic-inicial">Valor inicial (R$)</label>
+              <input id="selic-inicial" name="inicial" class="money" type="text" inputmode="decimal" autocomplete="off" value="10.000,00">
+            </div>
+            <div class="field">
+              <label for="selic-aporte">Aporte mensal (R$)</label>
+              <input id="selic-aporte" name="aporte" class="money" type="text" inputmode="decimal" autocomplete="off" value="500,00">
+            </div>
+          </div>
+
+          <fieldset class="group helper">
+            <legend>Calcular a taxa pela Selic (opcional)</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="selic-selic">Taxa Selic (% a.a.)</label>
+                <input id="selic-selic" name="selic" type="text" inputmode="decimal" autocomplete="off" value="15,00" data-ignore-live>
+              </div>
+              <div class="field">
+                <label for="selic-spread">Ágio/deságio do título (% a.a.)</label>
+                <input id="selic-spread" name="spread" type="text" inputmode="decimal" autocomplete="off" value="0,05" data-ignore-live>
+              </div>
+            </div>
+            <button type="button" class="btn secondary" data-action="aplicar-selic">Usar esta taxa</button>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend>Taxa de juros</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="selic-taxa-aa">Ao ano (% a.a.)</label>
+                <input id="selic-taxa-aa" name="taxa_aa" type="text" inputmode="decimal" autocomplete="off" aria-describedby="selic-taxa-hint">
+              </div>
+              <div class="field">
+                <label for="selic-taxa-am">Ao mês (% a.m.)</label>
+                <input id="selic-taxa-am" name="taxa_am" type="text" inputmode="decimal" autocomplete="off" aria-describedby="selic-taxa-hint">
+              </div>
+            </div>
+            <p class="hint" id="selic-taxa-hint">Preencha um dos campos. O outro é calculado automaticamente por juros compostos.</p>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend>Prazo para resgate</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="selic-meses">Em meses</label>
+                <input id="selic-meses" name="meses" type="text" inputmode="numeric" autocomplete="off" value="36">
+              </div>
+              <div class="field">
+                <label for="selic-anos">Em anos</label>
+                <input id="selic-anos" name="anos" type="text" inputmode="decimal" autocomplete="off" value="3">
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="selic-custodia">Taxa de custódia B3 (% a.a.)</label>
+            <input id="selic-custodia" name="custodia" type="text" inputmode="decimal" autocomplete="off" value="0,20">
+          </div>
+
+          <div class="check">
+            <input id="selic-ir" name="ir" type="checkbox" checked>
+            <label for="selic-ir">Descontar Imposto de Renda (tabela regressiva)</label>
+          </div>
+
+          <p class="form-error" role="alert"></p>
+          <button type="submit" class="btn primary">Simular</button>
+        </form>
+        <div class="results" id="results-selic" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ===================== TESOURO DIRETO ===================== -->
+    <section id="panel-tesouro" role="tabpanel" aria-labelledby="tab-tesouro" class="panel" hidden>
+      <div class="layout">
+        <form id="form-tesouro" class="card form" data-tipo="tesouro" novalidate>
+          <h2>Simulação do Tesouro Direto</h2>
+
+          <div class="field">
+            <label for="tesouro-titulo">Título</label>
+            <select id="tesouro-titulo" name="titulo">
+              <option value="prefixado" selected>Tesouro Prefixado</option>
+              <option value="ipca">Tesouro IPCA+</option>
+            </select>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="tesouro-inicial">Valor inicial (R$)</label>
+              <input id="tesouro-inicial" name="inicial" class="money" type="text" inputmode="decimal" autocomplete="off" value="10.000,00">
+            </div>
+            <div class="field">
+              <label for="tesouro-aporte">Aporte mensal (R$)</label>
+              <input id="tesouro-aporte" name="aporte" class="money" type="text" inputmode="decimal" autocomplete="off" value="500,00">
+            </div>
+          </div>
+
+          <fieldset class="group helper ipca-only" hidden>
+            <legend>Calcular a taxa do IPCA+</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="tesouro-ipca">IPCA projetado (% a.a.)</label>
+                <input id="tesouro-ipca" name="ipca" type="text" inputmode="decimal" autocomplete="off" value="4,50" data-ignore-live>
+              </div>
+              <div class="field">
+                <label for="tesouro-real">Taxa real contratada (% a.a.)</label>
+                <input id="tesouro-real" name="real" type="text" inputmode="decimal" autocomplete="off" value="7,50" data-ignore-live>
+              </div>
+            </div>
+            <button type="button" class="btn secondary" data-action="aplicar-ipca">Usar esta taxa</button>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend>Taxa de juros</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="tesouro-taxa-aa">Ao ano (% a.a.)</label>
+                <input id="tesouro-taxa-aa" name="taxa_aa" type="text" inputmode="decimal" autocomplete="off" value="13,50" aria-describedby="tesouro-taxa-hint">
+              </div>
+              <div class="field">
+                <label for="tesouro-taxa-am">Ao mês (% a.m.)</label>
+                <input id="tesouro-taxa-am" name="taxa_am" type="text" inputmode="decimal" autocomplete="off" aria-describedby="tesouro-taxa-hint">
+              </div>
+            </div>
+            <p class="hint" id="tesouro-taxa-hint">Preencha um dos campos. O outro é calculado automaticamente por juros compostos.</p>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend>Prazo para resgate</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="tesouro-meses">Em meses</label>
+                <input id="tesouro-meses" name="meses" type="text" inputmode="numeric" autocomplete="off" value="60">
+              </div>
+              <div class="field">
+                <label for="tesouro-anos">Em anos</label>
+                <input id="tesouro-anos" name="anos" type="text" inputmode="decimal" autocomplete="off" value="5">
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="tesouro-custodia">Taxa de custódia B3 (% a.a.)</label>
+            <input id="tesouro-custodia" name="custodia" type="text" inputmode="decimal" autocomplete="off" value="0,20">
+          </div>
+
+          <div class="check">
+            <input id="tesouro-ir" name="ir" type="checkbox" checked>
+            <label for="tesouro-ir">Descontar Imposto de Renda (tabela regressiva)</label>
+          </div>
+
+          <p class="form-error" role="alert"></p>
+          <button type="submit" class="btn primary">Simular</button>
+        </form>
+        <div class="results" id="results-tesouro" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ===================== APOSENTADORIA ===================== -->
+    <section id="panel-aposentadoria" role="tabpanel" aria-labelledby="tab-aposentadoria" class="panel" hidden>
+      <div class="layout">
+        <form id="form-aposentadoria" class="card form" data-tipo="aposentadoria" novalidate>
+          <h2>Planejamento de aposentadoria</h2>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="apo-idade">Idade atual (anos)</label>
+              <input id="apo-idade" name="idade" type="text" inputmode="numeric" autocomplete="off" value="30">
+            </div>
+            <div class="field">
+              <label for="apo-inflacao">Inflação esperada (% a.a.)</label>
+              <input id="apo-inflacao" name="inflacao" type="text" inputmode="decimal" autocomplete="off" value="4,00">
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="apo-inicial">Valor já investido (R$)</label>
+              <input id="apo-inicial" name="inicial" class="money" type="text" inputmode="decimal" autocomplete="off" value="20.000,00">
+            </div>
+            <div class="field">
+              <label for="apo-aporte">Aporte mensal (R$)</label>
+              <input id="apo-aporte" name="aporte" class="money" type="text" inputmode="decimal" autocomplete="off" value="1.000,00">
+            </div>
+          </div>
+
+          <fieldset class="group">
+            <legend>Taxa de juros durante a acumulação</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="apo-taxa-aa">Ao ano (% a.a.)</label>
+                <input id="apo-taxa-aa" name="taxa_aa" type="text" inputmode="decimal" autocomplete="off" value="10,00" aria-describedby="apo-taxa-hint">
+              </div>
+              <div class="field">
+                <label for="apo-taxa-am">Ao mês (% a.m.)</label>
+                <input id="apo-taxa-am" name="taxa_am" type="text" inputmode="decimal" autocomplete="off" aria-describedby="apo-taxa-hint">
+              </div>
+            </div>
+            <p class="hint" id="apo-taxa-hint">Taxa nominal. A inflação informada é descontada para mostrar os valores reais.</p>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend>Tempo até a aposentadoria</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="apo-meses">Em meses</label>
+                <input id="apo-meses" name="meses" type="text" inputmode="numeric" autocomplete="off" value="420">
+              </div>
+              <div class="field">
+                <label for="apo-anos">Em anos</label>
+                <input id="apo-anos" name="anos" type="text" inputmode="decimal" autocomplete="off" value="35">
+              </div>
+            </div>
+            <p class="hint" id="apo-idade-final" aria-live="polite"></p>
+          </fieldset>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="apo-renda">Renda mensal desejada (R$, valores de hoje)</label>
+              <input id="apo-renda" name="renda" class="money" type="text" inputmode="decimal" autocomplete="off" value="5.000,00">
+            </div>
+            <div class="field">
+              <label for="apo-usufruto">Anos recebendo a renda</label>
+              <input id="apo-usufruto" name="usufruto" type="text" inputmode="numeric" autocomplete="off" value="0" aria-describedby="apo-usufruto-hint">
+            </div>
+          </div>
+          <p class="hint" id="apo-usufruto-hint">Use 0 para viver apenas dos rendimentos, sem consumir o patrimônio.</p>
+
+          <p class="form-error" role="alert"></p>
+          <button type="submit" class="btn primary">Simular</button>
+        </form>
+        <div class="results" id="results-aposentadoria" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <aside class="disclaimer card">
+      <h2>Observações</h2>
+      <ul>
+        <li>As simulações têm caráter educativo e não constituem recomendação de investimento.</li>
+        <li>As taxas preenchidas por padrão são ilustrativas. Atualize-as com os valores vigentes.</li>
+        <li>Imposto de Renda regressivo: 22,5% até 6 meses, 20% de 7 a 12 meses, 17,5% de 13 a 24 meses e 15% acima de 24 meses. Cada aporte é tributado conforme o próprio tempo de aplicação.</li>
+        <li>O prazo é contado em meses de 30 dias, sem IOF (aplicável só a resgates em menos de 30 dias). Os aportes são feitos ao final de cada mês.</li>
+      </ul>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Simulador de Investimentos. Valores aproximados.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
